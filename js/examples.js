@@ -1,7 +1,7 @@
 import { parseAssetDirectives, fetchAssets } from './assets.js';
 
 export const EXAMPLES_MANIFEST = [
-	// 1. Tutorials (Pure C3, no graphics — simple → complex)
+	// 1. Tutorials (Pure C3, no graphics - simple -> complex)
 	{ id: "hello_world",          category: "Tutorials", name: "Hello World",              file: "examples/tutorials/01_hello_world.c3" },
 	{ id: "slices_and_defer",     category: "Tutorials", name: "Slices & Defer",           file: "examples/tutorials/02_slices_and_defer.c3" },
 	{ id: "reflection",           category: "Tutorials", name: "Reflection",               file: "examples/tutorials/03_reflection.c3" },
@@ -11,7 +11,7 @@ export const EXAMPLES_MANIFEST = [
 	{ id: "simd_vectors",         category: "Tutorials", name: "SIMD Vectors",             file: "examples/tutorials/07_simd_vectors.c3" },
 	{ id: "brainfuck",            category: "Tutorials", name: "Brainfuck Interpreter",    file: "examples/tutorials/08_brainfuck_interpreter.c3" },
 
-	// 2. Examples (Raylib demos — simple → complex)
+	// 2. Examples (Raylib demos - simple -> complex)
 	{ id: "raylib_beep",          category: "Examples",  name: "Beep & Draw",              file: "examples/examples/01_raylib_beep.c3" },
 	{ id: "particles_and_input",  category: "Examples",  name: "Particles & Input",        file: "examples/examples/02_particles_and_input.c3" },
 	{ id: "raylib_3d_camera",     category: "Examples",  name: "3D FPS Camera",            file: "examples/examples/03_raylib_3d_camera.c3" },
@@ -24,6 +24,7 @@ export const EXAMPLES_MANIFEST = [
 	// 3. Games
 	{ id: "neon_overdrive",       category: "Games",     name: "Neon Overdrive",           file: "examples/games/01_neon_overdrive.c3" },
 	{ id: "snake",                category: "Games",     name: "Snake",                    file: "examples/games/02_snake.c3" },
+	{ id: "arkanoid",             category: "Games",     name: "Arkanoid",                 file: "examples/games/03_arkanoid.c3" },
 
 	// 4. Apps
 	{ id: "piano",                category: "Apps",      name: "Piano & MIDI Recorder",    file: "examples/apps/01_piano.c3" },

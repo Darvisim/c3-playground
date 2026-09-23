@@ -199,6 +199,9 @@ function stopExecution() {
 	if (container) container.style.display = "none";
 
 	// 1. Cancel running Emscripten main loop / animation frame
+	const canvas = document.getElementById("canvas");
+	canvas?.getContext("webgl2")?.getExtension("WEBGL_lose_context")?.loseContext();
+
 	if (currentEmscriptenInstance) {
 		try {
 			if (typeof currentEmscriptenInstance.cancelMainLoop === "function") {
