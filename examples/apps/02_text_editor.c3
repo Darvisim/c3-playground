@@ -1,7 +1,7 @@
 // @asset: https://raw.githubusercontent.com/ManuLinares/c3ed/refs/heads/main/dep/IntoneMonoNerdFontMono-Regular.ttf.gz -> /dep/IntoneMonoNerdFontMono-Regular.ttf.gz
 
 module c3ed::config;
-import std, c3ed::gfx;
+import std, c3ed::gfxx;
 
 alias Color = char[<4>];
 
@@ -430,6 +430,7 @@ fn EditorCommand resolve_key_command(Key key, KeyModifiers mods)
 	}
 	return CMD_NONE;
 }
+
 module c3ed;
 import std;
 
@@ -1882,6 +1883,7 @@ fn void Tab.ensure_cursor_visible(&self, int visible_lines, int visible_cols)
 {
 	self.ensure_pos_visible(self.doc.primary_cursor().pos, visible_lines, visible_cols);
 }
+
 module c3ed;
 import std;
 
@@ -3252,7 +3254,7 @@ fn bool Editor.handle_edit_command(&self, EditorCommand cmd)
 			}
 			if (tmp.len() > 0)
 			{
-				gfx::set_clipboard(tmp.str_view());
+				gfxx::set_clipboard(tmp.str_view());
 			}
 			return false;
 
@@ -3269,13 +3271,13 @@ fn bool Editor.handle_edit_command(&self, EditorCommand cmd)
 			}
 			if (tmp.len() > 0)
 			{
-				gfx::set_clipboard(tmp.str_view());
+				gfxx::set_clipboard(tmp.str_view());
 			}
 			doc.delete_selection();
 			return true;
 
 		case CMD_PASTE:
-			String? clip_opt = gfx::get_clipboard(tmem);
+			String? clip_opt = gfxx::get_clipboard(tmem);
 			if (try clip = clip_opt)
 			{
 				doc.@mutate_cursors(; cur, delta)
@@ -3497,7 +3499,9 @@ fn void Editor.dispatch_command(&self, EditorCommand cmd, LayoutMetrics* lm, flo
 	{
 		self.active_tab().ensure_cursor_visible(lm.visible_lines, lm.visible_cols);
 	}
-}module c3ed::gfx;
+}
+
+module c3ed::gfxx;
 import std, raylib6, c3ed::config;
 
 // --- Fast Window Initialization Stubs for Linux/POSIX ---
@@ -3662,13 +3666,15 @@ fn void set_clipboard(String text) => @pool()
 {
 	if (text.len > 15 * 1024 * 1024) return;
 	rl::set_clipboard_text(text.zstr_tcopy());
-}module c3ed;
+}
+
+module c3ed;
 import std;
 
 Editor editor;
 String current_workspace = ".";
 
-fn bool key_pressed_or_repeat(Key key) => gfx::is_key_pressed(key) || gfx::is_key_repeat(key);
+fn bool key_pressed_or_repeat(Key key) => gfxx::is_key_pressed(key) || gfxx::is_key_repeat(key);
 
 macro void @handle_list_picker_keys(#picker, int visible_rows)
 {
@@ -3683,12 +3689,12 @@ macro void @handle_list_picker_keys(#picker, int visible_rows)
 		#picker.page_down();
 		editor.reset_cursor_blink();
 	}
-	if (key_pressed_or_repeat(UP) || (editor.modifiers.ctrl && (gfx::is_key_pressed(P) || gfx::is_key_pressed(K))))
+	if (key_pressed_or_repeat(UP) || (editor.modifiers.ctrl && (gfxx::is_key_pressed(P) || gfxx::is_key_pressed(K))))
 	{
 		#picker.select_prev();
 		editor.reset_cursor_blink();
 	}
-	if (key_pressed_or_repeat(DOWN) || (editor.modifiers.ctrl && (gfx::is_key_pressed(N) || gfx::is_key_pressed(J))))
+	if (key_pressed_or_repeat(DOWN) || (editor.modifiers.ctrl && (gfxx::is_key_pressed(N) || gfxx::is_key_pressed(J))))
 	{
 		#picker.select_next();
 		editor.reset_cursor_blink();
@@ -3713,9 +3719,9 @@ fn void update_editor_events(LayoutMetrics* lm, float dt, int screen_w, int heig
 	Document* doc = &tab.doc;
 
 	editor.modifiers = {
-		.shift = gfx::is_key_down(LEFT_SHIFT) || gfx::is_key_down(RIGHT_SHIFT),
-		.ctrl  = gfx::is_key_down(LEFT_CONTROL) || gfx::is_key_down(RIGHT_CONTROL),
-		.alt   = gfx::is_key_down(LEFT_ALT) || gfx::is_key_down(RIGHT_ALT)
+		.shift = gfxx::is_key_down(LEFT_SHIFT) || gfxx::is_key_down(RIGHT_SHIFT),
+		.ctrl  = gfxx::is_key_down(LEFT_CONTROL) || gfxx::is_key_down(RIGHT_CONTROL),
+		.alt   = gfxx::is_key_down(LEFT_ALT) || gfxx::is_key_down(RIGHT_ALT)
 	};
 
 	editor.blink_timer += dt;
@@ -3732,7 +3738,7 @@ fn void update_editor_events(LayoutMetrics* lm, float dt, int screen_w, int heig
 
 	if (editor.modal.kind != NONE)
 	{
-		if (gfx::is_key_pressed(ESCAPE))
+		if (gfxx::is_key_pressed(ESCAPE))
 		{
 			editor.confirm_cancel_action();
 			return;
@@ -3749,9 +3755,9 @@ fn void update_editor_events(LayoutMetrics* lm, float dt, int screen_w, int heig
 		int row_h        = math::max(config::LAYOUT_METRICS.modal_row_h_min, lm.line_height);
 		int visible_rows = math::max(1, list_h / row_h);
 
-		if (gfx::is_mouse_pressed(LEFT))
+		if (gfxx::is_mouse_pressed(LEFT))
 		{
-			Vec2 mouse_v = gfx::get_mouse_pos();
+			Vec2 mouse_v = gfxx::get_mouse_pos();
 
 			if (mouse_v.x < mrect.x - 4.0f || mouse_v.x > mrect.x + mrect.width + 4.0f
 				|| mouse_v.y < mrect.y - 4.0f || mouse_v.y > mrect.y + mrect.height + 4.0f)
@@ -3855,7 +3861,7 @@ fn void update_editor_events(LayoutMetrics* lm, float dt, int screen_w, int heig
 			}
 		}
 
-		float modal_wheel = gfx::get_mouse_wheel();
+		float modal_wheel = gfxx::get_mouse_wheel();
 		if (modal_wheel != 0.0f)
 		{
 			if (editor.modal.kind == QUICK_OPEN || editor.modal.kind == GLOBAL_GREP || editor.modal.kind == SYMBOL_OUTLINE)
@@ -3871,7 +3877,7 @@ fn void update_editor_events(LayoutMetrics* lm, float dt, int screen_w, int heig
 
 		if (editor.modal.kind == FIND || editor.modal.kind == REPLACE)
 		{
-			if (editor.modifiers.alt && gfx::is_key_pressed(C))
+			if (editor.modifiers.alt && gfxx::is_key_pressed(C))
 			{
 				editor.modal.search_case_sensitive = !editor.modal.search_case_sensitive;
 				editor.modal.update_cached_search_matches(doc);
@@ -3887,11 +3893,11 @@ fn void update_editor_events(LayoutMetrics* lm, float dt, int screen_w, int heig
 			case CONFIRM_CLOSE_TAB:
 			case CONFIRM_EXIT:
 			case CONFIRM_DISK_RELOAD:
-				if (gfx::is_key_pressed(Y)) editor.confirm_save_action();
-				if (gfx::is_key_pressed(N)) editor.confirm_discard_action();
+				if (gfxx::is_key_pressed(Y)) editor.confirm_save_action();
+				if (gfxx::is_key_pressed(N)) editor.confirm_discard_action();
 
 			case GOTO_LINE:
-				if (gfx::is_key_pressed(ENTER) || gfx::is_key_pressed(KP_ENTER))
+				if (gfxx::is_key_pressed(ENTER) || gfxx::is_key_pressed(KP_ENTER))
 				{
 					int target         = string::to_integer{int}(editor.modal.input.view()) ?? 1;
 					BytePos target_pos = doc.get_pos_from_line_col(
@@ -3907,7 +3913,7 @@ fn void update_editor_events(LayoutMetrics* lm, float dt, int screen_w, int heig
 			case FIND:
 				if (key_pressed_or_repeat(DOWN)) editor.modal.find_next(doc, false, tab, lm.visible_lines, lm.visible_cols);
 				if (key_pressed_or_repeat(UP))   editor.modal.find_next(doc, true, tab, lm.visible_lines, lm.visible_cols);
-				if (gfx::is_key_pressed(ENTER) || gfx::is_key_pressed(KP_ENTER) || gfx::is_key_pressed(F3))
+				if (gfxx::is_key_pressed(ENTER) || gfxx::is_key_pressed(KP_ENTER) || gfxx::is_key_pressed(F3))
 				{
 					editor.modal.find_next(doc, editor.modifiers.shift, tab, lm.visible_lines, lm.visible_cols);
 				}
@@ -3915,14 +3921,14 @@ fn void update_editor_events(LayoutMetrics* lm, float dt, int screen_w, int heig
 			case REPLACE:
 				switch
 				{
-					case gfx::is_key_pressed(TAB) || key_pressed_or_repeat(UP) || key_pressed_or_repeat(DOWN):
+					case gfxx::is_key_pressed(TAB) || key_pressed_or_repeat(UP) || key_pressed_or_repeat(DOWN):
 						editor.modal.focus_field = 1 - editor.modal.focus_field;
 						editor.reset_cursor_blink();
-					case gfx::is_key_pressed(ENTER) || gfx::is_key_pressed(KP_ENTER):
+					case gfxx::is_key_pressed(ENTER) || gfxx::is_key_pressed(KP_ENTER):
 						(editor.modifiers.ctrl || editor.modifiers.alt)
 							? editor.modal.replace_all(doc, tab, lm.visible_lines, lm.visible_cols)
 							: editor.modal.replace_next(doc, tab, lm.visible_lines, lm.visible_cols);
-					case gfx::is_key_pressed(F3):
+					case gfxx::is_key_pressed(F3):
 						editor.modal.find_next(doc, editor.modifiers.shift, tab, lm.visible_lines, lm.visible_cols);
 				}
 
@@ -3930,7 +3936,7 @@ fn void update_editor_events(LayoutMetrics* lm, float dt, int screen_w, int heig
 			case GLOBAL_GREP:
 			case SYMBOL_OUTLINE:
 				@handle_list_picker_keys(editor.modal.picker, visible_rows);
-				if (gfx::is_key_pressed(ENTER) || gfx::is_key_pressed(KP_ENTER))
+				if (gfxx::is_key_pressed(ENTER) || gfxx::is_key_pressed(KP_ENTER))
 				{
 					if (editor.modal.picker.items.len() > 0)
 					{
@@ -3964,7 +3970,7 @@ fn void update_editor_events(LayoutMetrics* lm, float dt, int screen_w, int heig
 				}
 
 			case SAVE_AS:
-				if (gfx::is_key_pressed(ENTER) || gfx::is_key_pressed(KP_ENTER))
+				if (gfxx::is_key_pressed(ENTER) || gfxx::is_key_pressed(KP_ENTER))
 				{
 					String target_file = resolve_path_string(editor.modal.input.view(), tmem);
 					if (target_file.len > 0)
@@ -4027,24 +4033,24 @@ fn void update_editor_events(LayoutMetrics* lm, float dt, int screen_w, int heig
 			}
 			editor.reset_cursor_blink();
 		}
-		if (gfx::is_key_pressed(HOME))
+		if (gfxx::is_key_pressed(HOME))
 		{
 			active_input.cursor_pos = 0;
 			editor.reset_cursor_blink();
 		}
-		if (gfx::is_key_pressed(END))
+		if (gfxx::is_key_pressed(END))
 		{
 			active_input.cursor_pos = active_input.length;
 			editor.reset_cursor_blink();
 		}
 
 		bool input_modified = false;
-		bool is_paste_event = (editor.modifiers.ctrl  && gfx::is_key_pressed(V))
-			               || (editor.modifiers.shift && gfx::is_key_pressed(INSERT));
+		bool is_paste_event = (editor.modifiers.ctrl  && gfxx::is_key_pressed(V))
+			               || (editor.modifiers.shift && gfxx::is_key_pressed(INSERT));
 
 		if (is_paste_event)
 		{
-			String? clip_opt = gfx::get_clipboard(tmem);
+			String? clip_opt = gfxx::get_clipboard(tmem);
 			if (try clip = clip_opt)
 			{
 				String sanitized = clip.trim("\r\n");
@@ -4065,14 +4071,14 @@ fn void update_editor_events(LayoutMetrics* lm, float dt, int screen_w, int heig
 		}
 		if (key_pressed_or_repeat(DELETE) && active_input.delete()) input_modified = true;
 
-		int char_code = gfx::get_char_pressed();
+		int char_code = gfxx::get_char_pressed();
 		while (char_code > 0)
 		{
 			if (char_code >= 32 && (!editor.modifiers.ctrl || editor.modifiers.alt))
 			{
 				if (active_input.insert_codepoint((Char32)char_code)) input_modified = true;
 			}
-			char_code = gfx::get_char_pressed();
+			char_code = gfxx::get_char_pressed();
 		}
 
 		if (input_modified)
@@ -4107,7 +4113,7 @@ fn void update_editor_events(LayoutMetrics* lm, float dt, int screen_w, int heig
 
 	if (editor.autocomplete.is_active)
 	{
-		if (gfx::is_key_pressed(ESCAPE))
+		if (gfxx::is_key_pressed(ESCAPE))
 		{
 			editor.autocomplete.is_active = false;
 			return;
@@ -4125,7 +4131,7 @@ fn void update_editor_events(LayoutMetrics* lm, float dt, int screen_w, int heig
 			}
 			return;
 		}
-		if (gfx::is_key_pressed(TAB) || gfx::is_key_pressed(ENTER) || gfx::is_key_pressed(KP_ENTER))
+		if (gfxx::is_key_pressed(TAB) || gfxx::is_key_pressed(ENTER) || gfxx::is_key_pressed(KP_ENTER))
 		{
 			if (editor.autocomplete.items.len() > 0)
 			{
@@ -4146,10 +4152,10 @@ fn void update_editor_events(LayoutMetrics* lm, float dt, int screen_w, int heig
 		}
 	}
 
-	Vec2 mouse_pos = gfx::get_mouse_pos();
+	Vec2 mouse_pos = gfxx::get_mouse_pos();
 	int tot_lines  = doc.get_total_lines();
 
-	if (!gfx::is_mouse_down(LEFT))
+	if (!gfxx::is_mouse_down(LEFT))
 	{
 		if (editor.terminal.selecting)
 		{
@@ -4159,7 +4165,7 @@ fn void update_editor_events(LayoutMetrics* lm, float dt, int screen_w, int heig
 				String? sel_text = editor.terminal.extract_selection(tmem);
 				if (try t = sel_text)
 				{
-					gfx::set_clipboard(t);
+					gfxx::set_clipboard(t);
 				}
 			}
 		}
@@ -4172,7 +4178,7 @@ fn void update_editor_events(LayoutMetrics* lm, float dt, int screen_w, int heig
 
 	switch
 	{
-		case gfx::is_mouse_pressed(LEFT):
+		case gfxx::is_mouse_pressed(LEFT):
 			if (editor.terminal.is_open && lm.terminal_height > 0)
 			{
 				int ty = (int)lm.terminal_rect.y;
@@ -4300,7 +4306,7 @@ fn void update_editor_events(LayoutMetrics* lm, float dt, int screen_w, int heig
 			editor.scrollbar_dragging = false;
 			editor.minimap_dragging = false;
 			editor.mouse_down = true;
-			double now = gfx::get_time();
+			double now = gfxx::get_time();
 
 			int rel_y = (int)(mouse_pos.y - (float)lm.text_start_y);
 			int line  = rel_y / lm.line_height + tab.scroll_line;
@@ -4366,7 +4372,7 @@ fn void update_editor_events(LayoutMetrics* lm, float dt, int screen_w, int heig
 			}
 			editor.reset_cursor_blink();
 
-		case editor.terminal.selecting && gfx::is_mouse_down(LEFT):
+		case editor.terminal.selecting && gfxx::is_mouse_down(LEFT):
 			if (editor.terminal.is_open && lm.terminal_height > 0)
 			{
 				int ty = (int)lm.terminal_rect.y;
@@ -4382,7 +4388,7 @@ fn void update_editor_events(LayoutMetrics* lm, float dt, int screen_w, int heig
 				editor.terminal.sel_end_col = drag_col;
 			}
 
-		case editor.scrollbar_dragging && gfx::is_mouse_down(LEFT):
+		case editor.scrollbar_dragging && gfxx::is_mouse_down(LEFT):
 			if (tot_lines > lm.visible_lines)
 			{
 				float max_scroll   = (float)(tot_lines - lm.visible_lines);
@@ -4395,7 +4401,7 @@ fn void update_editor_events(LayoutMetrics* lm, float dt, int screen_w, int heig
 				editor.reset_cursor_blink();
 			}
 
-		case editor.minimap_dragging && gfx::is_mouse_down(LEFT):
+		case editor.minimap_dragging && gfxx::is_mouse_down(LEFT):
 			if (tot_lines > lm.visible_lines)
 			{
 				float mm_y = lm.minimap_rect.y;
@@ -4407,7 +4413,7 @@ fn void update_editor_events(LayoutMetrics* lm, float dt, int screen_w, int heig
 				editor.reset_cursor_blink();
 			}
 
-		case editor.mouse_down && gfx::is_mouse_down(LEFT):
+		case editor.mouse_down && gfxx::is_mouse_down(LEFT):
 			int rel_y = (int)(mouse_pos.y - (float)lm.text_start_y);
 			int line  = rel_y / lm.line_height + tab.scroll_line;
 			int rel_x = (int)(mouse_pos.x - (float)lm.text_start_x + (float)lm.char_width * 0.5f);
@@ -4455,7 +4461,7 @@ fn void update_editor_events(LayoutMetrics* lm, float dt, int screen_w, int heig
 			cur_p.target_col = doc.get_col(cur_p.pos);
 			editor.reset_cursor_blink();
 
-		case gfx::is_mouse_released(LEFT):
+		case gfxx::is_mouse_released(LEFT):
 			if (editor.terminal.selecting)
 			{
 				editor.terminal.selecting = false;
@@ -4464,7 +4470,7 @@ fn void update_editor_events(LayoutMetrics* lm, float dt, int screen_w, int heig
 					String? sel_text = editor.terminal.extract_selection(tmem);
 					if (try t = sel_text)
 					{
-						gfx::set_clipboard(t);
+						gfxx::set_clipboard(t);
 					}
 				}
 			}
@@ -4475,7 +4481,7 @@ fn void update_editor_events(LayoutMetrics* lm, float dt, int screen_w, int heig
 			editor.minimap_dragging = false;
 	}
 
-	float wheel = gfx::get_mouse_wheel();
+	float wheel = gfxx::get_mouse_wheel();
 	if (wheel != 0.0f)
 	{
 		if (editor.terminal.is_open && lm.terminal_height > 0)
@@ -4503,7 +4509,7 @@ fn void update_editor_events(LayoutMetrics* lm, float dt, int screen_w, int heig
 		editor.reset_cursor_blink();
 	}
 
-	bool page_held = gfx::is_key_down(PAGE_UP) || gfx::is_key_down(PAGE_DOWN);
+	bool page_held = gfxx::is_key_down(PAGE_UP) || gfxx::is_key_down(PAGE_DOWN);
 	editor.page_hold_timer = page_held ? editor.page_hold_timer + dt : 0.0f;
 
 	for (int k = 32; k < 349; k++)
@@ -4533,7 +4539,7 @@ fn void update_editor_events(LayoutMetrics* lm, float dt, int screen_w, int heig
 					case editor.modifiers.alt && (key == UP || key == DOWN || key == C):
 						is_triggered = key_pressed_or_repeat(key);
 					default:
-						is_triggered = gfx::is_key_pressed(key);
+						is_triggered = gfxx::is_key_pressed(key);
 				}
 		}
 		if (is_triggered)
@@ -4543,7 +4549,7 @@ fn void update_editor_events(LayoutMetrics* lm, float dt, int screen_w, int heig
 		}
 	}
 
-	int cp = gfx::get_char_pressed();
+	int cp = gfxx::get_char_pressed();
 	while (cp > 0)
 	{
 		if (cp >= 32 && (!editor.modifiers.ctrl || editor.modifiers.alt))
@@ -4599,16 +4605,16 @@ fn void update_editor_events(LayoutMetrics* lm, float dt, int screen_w, int heig
 				}
 			}
 		}
-		cp = gfx::get_char_pressed();
+		cp = gfxx::get_char_pressed();
 	}
 }
 
 fn void update_draw_frame() => @pool()
 {
 	font::init_font_texture();
-	float dt     = gfx::get_frame_time();
-	int screen_w = gfx::get_screen_width();
-	int height   = gfx::get_screen_height();
+	float dt     = gfxx::get_frame_time();
+	int screen_w = gfxx::get_screen_width();
+	int height   = gfxx::get_screen_height();
 	if (screen_w <= 0) screen_w = 1600;
 	if (height <= 0) height = 900;
 
@@ -4737,14 +4743,14 @@ fn int main(String[] args)
 		}
 	}
 
-	gfx::init_window(1024, 600, "C3 Text Editor");
+	gfxx::init_window(1024, 600, "C3 Text Editor");
 
 	$if env::WASM:
 		emscripten_set_main_loop(&update_draw_frame, 60, 1);
 	$else
 		while (!editor.should_exit)
 		{
-			if (gfx::should_close())
+			if (gfxx::should_close())
 			{
 				bool any_modified = false;
 				foreach (&t : editor.tabs)
@@ -4770,14 +4776,16 @@ fn int main(String[] args)
 
 		editor.save_session(current_workspace);
 		editor.free();
-		gfx::close_window();
+		gfxx::close_window();
 	$endif
 
 	return 0;
 }
 
 alias EmCallbackFunc = fn void();
-extern fn void emscripten_set_main_loop(EmCallbackFunc func, int fps, int simulate_infinite_loop) @feat(WASM);module c3ed;
+extern fn void emscripten_set_main_loop(EmCallbackFunc func, int fps, int simulate_infinite_loop) @feat(WASM);
+
+module c3ed;
 import std;
 
 enum ModalKind : int
@@ -7189,7 +7197,7 @@ fn void cleanup_font()
 fn void draw_char(Char32 c, int px, int py, float scale, Color tint)
 {
 	if (c == ' ' || c == '\r' || c == '\n') return;
-	RLColor rl_tint = gfx::to_rl_color(tint);
+	RLColor rl_tint = gfxx::to_rl_color(tint);
 
 	if (ttf_loaded)
 	{
@@ -7269,7 +7277,9 @@ fn void draw_text(String str, int px, int py, float scale, Color tint)
 		draw_char(c, cur_x, py, scale, tint);
 		cur_x += advance;
 	}
-}module c3ed::ui;
+}
+
+module c3ed::ui;
 import std, c3ed;
 
 struct TextInputWidget
@@ -7664,22 +7674,22 @@ fn void render_modal(Editor* ed, int screen_w, int height, LayoutMetrics* lm)
 	int modal_h     = (int)mrect.height;
 	int input_box_h = math::max(config::LAYOUT_METRICS.modal_input_box_h_min, lm.char_height + config::LAYOUT_METRICS.modal_input_box_padding);
 
-	gfx::draw_rect(modal_x - 4, modal_y - 4, modal_w + 8, modal_h + 8, config::theme.gutter_border);
-	gfx::draw_rect(modal_x, modal_y, modal_w, modal_h, config::theme.header_bg);
+	gfxx::draw_rect(modal_x - 4, modal_y - 4, modal_w + 8, modal_h + 8, config::theme.gutter_border);
+	gfxx::draw_rect(modal_x, modal_y, modal_w, modal_h, config::theme.header_bg);
 
 	int prompt_y = modal_y + config::LAYOUT_METRICS.modal_padding_y;
 
 	if (ed.modal.kind == FIND || ed.modal.kind == REPLACE)
 	{
 		Rect toggle_rect = ed.get_case_toggle_rect(lm, screen_w, height);
-		Vec2 mouse_v = gfx::get_mouse_pos();
+		Vec2 mouse_v = gfxx::get_mouse_pos();
 		bool is_hover = mouse_v.x >= toggle_rect.x && mouse_v.x <= toggle_rect.x + toggle_rect.width
 			&& mouse_v.y >= toggle_rect.y && mouse_v.y <= toggle_rect.y + toggle_rect.height;
 
 		if (is_hover)
 		{
-			gfx::draw_rect((int)toggle_rect.x, (int)toggle_rect.y, (int)toggle_rect.width, (int)toggle_rect.height, config::theme.selection_bg);
-			gfx::draw_rect_lines((int)toggle_rect.x, (int)toggle_rect.y, (int)toggle_rect.width, (int)toggle_rect.height, config::theme.accent_blue);
+			gfxx::draw_rect((int)toggle_rect.x, (int)toggle_rect.y, (int)toggle_rect.width, (int)toggle_rect.height, config::theme.selection_bg);
+			gfxx::draw_rect_lines((int)toggle_rect.x, (int)toggle_rect.y, (int)toggle_rect.width, (int)toggle_rect.height, config::theme.accent_blue);
 		}
 	}
 
@@ -7687,7 +7697,7 @@ fn void render_modal(Editor* ed, int screen_w, int height, LayoutMetrics* lm)
 
 	if (ed.modal.kind == CONFIRM_EXIT || ed.modal.kind == CONFIRM_CLOSE_TAB || ed.modal.kind == CONFIRM_DISK_RELOAD)
 	{
-		Vec2 mouse_v = gfx::get_mouse_pos();
+		Vec2 mouse_v = gfxx::get_mouse_pos();
 
 		int btn_w = (modal_w - 32 - 24) / 3;
 		int btn_h = input_box_h;
@@ -7701,18 +7711,18 @@ fn void render_modal(Editor* ed, int screen_w, int height, LayoutMetrics* lm)
 		bool hover2 = mouse_v.x >= (float)btn2_x && mouse_v.x < (float)(btn2_x + btn_w) && mouse_v.y >= (float)btn_y && mouse_v.y < (float)(btn_y + btn_h);
 		bool hover3 = mouse_v.x >= (float)btn3_x && mouse_v.x < (float)(btn3_x + btn_w) && mouse_v.y >= (float)btn_y && mouse_v.y < (float)(btn_y + btn_h);
 
-		gfx::draw_rect(btn1_x, btn_y, btn_w, btn_h, hover1 ? config::theme.accent_green : config::theme.bg);
-		gfx::draw_rect_lines(btn1_x, btn_y, btn_w, btn_h, config::theme.accent_green);
+		gfxx::draw_rect(btn1_x, btn_y, btn_w, btn_h, hover1 ? config::theme.accent_green : config::theme.bg);
+		gfxx::draw_rect_lines(btn1_x, btn_y, btn_w, btn_h, config::theme.accent_green);
 		String b1_str = "[Y] Yes";
 		font::draw_text(b1_str, btn1_x + (btn_w - (int)b1_str.len * lm.char_width) / 2, btn_y + (btn_h - lm.char_height) / 2, lm.font_scale, hover1 ? config::theme.bg : config::theme.accent_green);
 
-		gfx::draw_rect(btn2_x, btn_y, btn_w, btn_h, hover2 ? config::theme.accent_red : config::theme.bg);
-		gfx::draw_rect_lines(btn2_x, btn_y, btn_w, btn_h, hover2 ? config::theme.accent_red : config::theme.gutter_border);
+		gfxx::draw_rect(btn2_x, btn_y, btn_w, btn_h, hover2 ? config::theme.accent_red : config::theme.bg);
+		gfxx::draw_rect_lines(btn2_x, btn_y, btn_w, btn_h, hover2 ? config::theme.accent_red : config::theme.gutter_border);
 		String b2_str = "[N] No";
 		font::draw_text(b2_str, btn2_x + (btn_w - (int)b2_str.len * lm.char_width) / 2, btn_y + (btn_h - lm.char_height) / 2, lm.font_scale, hover2 ? config::theme.bg : config::theme.accent_red);
 
-		gfx::draw_rect(btn3_x, btn_y, btn_w, btn_h, hover3 ? config::theme.selection_bg : config::theme.bg);
-		gfx::draw_rect_lines(btn3_x, btn_y, btn_w, btn_h, hover3 ? config::theme.accent_blue : config::theme.gutter_border);
+		gfxx::draw_rect(btn3_x, btn_y, btn_w, btn_h, hover3 ? config::theme.selection_bg : config::theme.bg);
+		gfxx::draw_rect_lines(btn3_x, btn_y, btn_w, btn_h, hover3 ? config::theme.accent_blue : config::theme.gutter_border);
 		String b3_str = "[Esc] Cancel";
 		font::draw_text(b3_str, btn3_x + (btn_w - (int)b3_str.len * lm.char_width) / 2, btn_y + (btn_h - lm.char_height) / 2, lm.font_scale, hover3 ? config::theme.text_bright : config::theme.text_muted);
 	}
@@ -7726,11 +7736,11 @@ fn void render_modal(Editor* ed, int screen_w, int height, LayoutMetrics* lm)
 		ed.modal.input.ensure_cursor_visible(max_vis_chars);
 		ed.modal.replace_input.ensure_cursor_visible(max_vis_chars);
 
-		gfx::draw_rect(modal_x + 16, input1_y, input_w, input_box_h, config::theme.bg);
+		gfxx::draw_rect(modal_x + 16, input1_y, input_w, input_box_h, config::theme.bg);
 		Color border1_col = (ed.modal.focus_field == 0) ? config::theme.accent_blue : config::theme.gutter_border;
-		gfx::draw_rect_lines(modal_x + 16, input1_y, input_w, input_box_h, border1_col);
+		gfxx::draw_rect_lines(modal_x + 16, input1_y, input_w, input_box_h, border1_col);
 
-		gfx::begin_scissor(modal_x + 18, input1_y, input_w - 4, input_box_h);
+		gfxx::begin_scissor(modal_x + 18, input1_y, input_w - 4, input_box_h);
 		int text_draw1_y = input1_y + (input_box_h - lm.char_height) / 2;
 		int text_draw1_x = modal_x + 24 - ed.modal.input.scroll_col * lm.char_width;
 		font::draw_text(ed.modal.input.view(), text_draw1_x, text_draw1_y, lm.font_scale, config::theme.text_bright);
@@ -7738,15 +7748,15 @@ fn void render_modal(Editor* ed, int screen_w, int height, LayoutMetrics* lm)
 		{
 			int cursor_col = (int)conv::utf8_codepoints(ed.modal.input.view()[:ed.modal.input.cursor_pos]);
 			int cur_x = modal_x + 24 + (cursor_col - ed.modal.input.scroll_col) * lm.char_width;
-			gfx::draw_rect(cur_x, text_draw1_y, 2, lm.char_height, config::theme.cursor);
+			gfxx::draw_rect(cur_x, text_draw1_y, 2, lm.char_height, config::theme.cursor);
 		}
-		gfx::end_scissor();
+		gfxx::end_scissor();
 
-		gfx::draw_rect(modal_x + 16, input2_y, input_w, input_box_h, config::theme.bg);
+		gfxx::draw_rect(modal_x + 16, input2_y, input_w, input_box_h, config::theme.bg);
 		Color border2_col = (ed.modal.focus_field == 1) ? config::theme.accent_blue : config::theme.gutter_border;
-		gfx::draw_rect_lines(modal_x + 16, input2_y, input_w, input_box_h, border2_col);
+		gfxx::draw_rect_lines(modal_x + 16, input2_y, input_w, input_box_h, border2_col);
 
-		gfx::begin_scissor(modal_x + 18, input2_y, input_w - 4, input_box_h);
+		gfxx::begin_scissor(modal_x + 18, input2_y, input_w - 4, input_box_h);
 		int text_draw2_y = input2_y + (input_box_h - lm.char_height) / 2;
 		int text_draw2_x = modal_x + 24 - ed.modal.replace_input.scroll_col * lm.char_width;
 		font::draw_text(ed.modal.replace_input.view(), text_draw2_x, text_draw2_y, lm.font_scale, config::theme.text_bright);
@@ -7754,9 +7764,9 @@ fn void render_modal(Editor* ed, int screen_w, int height, LayoutMetrics* lm)
 		{
 			int cursor_col = (int)conv::utf8_codepoints(ed.modal.replace_input.view()[:ed.modal.replace_input.cursor_pos]);
 			int cur_x = modal_x + 24 + (cursor_col - ed.modal.replace_input.scroll_col) * lm.char_width;
-			gfx::draw_rect(cur_x, text_draw2_y, 2, lm.char_height, config::theme.cursor);
+			gfxx::draw_rect(cur_x, text_draw2_y, 2, lm.char_height, config::theme.cursor);
 		}
-		gfx::end_scissor();
+		gfxx::end_scissor();
 	}
 	else
 	{
@@ -7766,10 +7776,10 @@ fn void render_modal(Editor* ed, int screen_w, int height, LayoutMetrics* lm)
 
 		ed.modal.input.ensure_cursor_visible(max_vis_chars);
 
-		gfx::draw_rect(modal_x + 16, input_y, input_w, input_box_h, config::theme.bg);
-		gfx::draw_rect_lines(modal_x + 16, input_y, input_w, input_box_h, config::theme.gutter_border);
+		gfxx::draw_rect(modal_x + 16, input_y, input_w, input_box_h, config::theme.bg);
+		gfxx::draw_rect_lines(modal_x + 16, input_y, input_w, input_box_h, config::theme.gutter_border);
 
-		gfx::begin_scissor(modal_x + 18, input_y, input_w - 4, input_box_h);
+		gfxx::begin_scissor(modal_x + 18, input_y, input_w - 4, input_box_h);
 		int text_draw_y = input_y + (input_box_h - lm.char_height) / 2;
 		int text_draw_x = modal_x + 24 - ed.modal.input.scroll_col * lm.char_width;
 		font::draw_text(ed.modal.input.view(), text_draw_x, text_draw_y, lm.font_scale, config::theme.text_bright);
@@ -7778,9 +7788,9 @@ fn void render_modal(Editor* ed, int screen_w, int height, LayoutMetrics* lm)
 		{
 			int cursor_col = (int)conv::utf8_codepoints(ed.modal.input.view()[:ed.modal.input.cursor_pos]);
 			int cur_x = modal_x + 24 + (cursor_col - ed.modal.input.scroll_col) * lm.char_width;
-			gfx::draw_rect(cur_x, text_draw_y, 2, lm.char_height, config::theme.cursor);
+			gfxx::draw_rect(cur_x, text_draw_y, 2, lm.char_height, config::theme.cursor);
 		}
-		gfx::end_scissor();
+		gfxx::end_scissor();
 
 		if (ed.modal.kind == QUICK_OPEN || ed.modal.kind == GLOBAL_GREP || ed.modal.kind == SYMBOL_OUTLINE)
 		{
@@ -7790,9 +7800,9 @@ fn void render_modal(Editor* ed, int screen_w, int height, LayoutMetrics* lm)
 			int max_rows = math::max(1, list_h / row_h);
 			ed.modal.picker.clamp_view(max_rows);
 
-			gfx::draw_rect(modal_x + config::LAYOUT_METRICS.modal_padding_x, list_y, input_w, list_h, config::theme.bg);
-			gfx::draw_rect_lines(modal_x + config::LAYOUT_METRICS.modal_padding_x, list_y, input_w, list_h, config::theme.gutter_border);
-			gfx::begin_scissor(modal_x + config::LAYOUT_METRICS.modal_padding_x, list_y, input_w, list_h);
+			gfxx::draw_rect(modal_x + config::LAYOUT_METRICS.modal_padding_x, list_y, input_w, list_h, config::theme.bg);
+			gfxx::draw_rect_lines(modal_x + config::LAYOUT_METRICS.modal_padding_x, list_y, input_w, list_h, config::theme.gutter_border);
+			gfxx::begin_scissor(modal_x + config::LAYOUT_METRICS.modal_padding_x, list_y, input_w, list_h);
 
 			for (int r = 0; r < max_rows; r++)
 			{
@@ -7802,7 +7812,7 @@ fn void render_modal(Editor* ed, int screen_w, int height, LayoutMetrics* lm)
 				bool is_selected = (idx == ed.modal.picker.selected_index);
 				if (is_selected)
 				{
-					gfx::draw_rect(modal_x + 18, ry - 1, input_w - 4, row_h - 2, config::theme.selection_bg);
+					gfxx::draw_rect(modal_x + 18, ry - 1, input_w - 4, row_h - 2, config::theme.selection_bg);
 				}
 
 				PickerItem item = ed.modal.picker.items[(sz)idx];
@@ -7820,7 +7830,7 @@ fn void render_modal(Editor* ed, int screen_w, int height, LayoutMetrics* lm)
 					font::draw_text(item.label, modal_x + 24, draw_text_y, lm.font_scale, text_col);
 				}
 			}
-			gfx::end_scissor();
+			gfxx::end_scissor();
 		}
 	}
 }
@@ -7837,12 +7847,12 @@ fn void render(Editor* ed, int screen_w, int height, LayoutMetrics* lm)
 	Tab* tab = ed.active_tab();
 	Document* doc = &tab.doc;
 
-	gfx::begin_frame();
-	gfx::clear_background(config::theme.bg);
+	gfxx::begin_frame();
+	gfxx::clear_background(config::theme.bg);
 
 	// Tab Bar
-	gfx::draw_rect(0, 0, screen_w, lm.tab_bar_height, config::theme.tab_bg);
-	gfx::draw_rect(0, lm.tab_bar_height - 1, screen_w, 1, config::theme.tab_border);
+	gfxx::draw_rect(0, 0, screen_w, lm.tab_bar_height, config::theme.tab_bg);
+	gfxx::draw_rect(0, lm.tab_bar_height - 1, screen_w, 1, config::theme.tab_border);
 
 	int tab_x       = 0;
 	int tab_h       = lm.tab_bar_height;
@@ -7867,12 +7877,12 @@ fn void render(Editor* ed, int screen_w, int height, LayoutMetrics* lm)
 		if (tab_w <= close_box_w + 10) break;
 
 		Color bg_col = is_active ? config::theme.tab_active_bg : config::theme.tab_bg;
-		gfx::draw_rect(tab_x, 0, tab_w, tab_h, bg_col);
-		gfx::draw_rect(tab_x + tab_w - 1, 0, 1, tab_h, config::theme.tab_border);
+		gfxx::draw_rect(tab_x, 0, tab_w, tab_h, bg_col);
+		gfxx::draw_rect(tab_x + tab_w - 1, 0, 1, tab_h, config::theme.tab_border);
 
 		if (is_active)
 		{
-			gfx::draw_rect(tab_x, 0, tab_w, 2, config::theme.accent_blue);
+			gfxx::draw_rect(tab_x, 0, tab_w, 2, config::theme.accent_blue);
 		}
 
 		Color txt_col = is_active ? config::theme.text_bright : config::theme.text_muted;
@@ -7881,9 +7891,9 @@ fn void render(Editor* ed, int screen_w, int height, LayoutMetrics* lm)
 		int label_w = tab_w - close_box_w - 8;
 		if (label_w > 0)
 		{
-			gfx::begin_scissor(tab_x + 8, 0, label_w, tab_h);
+			gfxx::begin_scissor(tab_x + 8, 0, label_w, tab_h);
 			font::draw_text(tab_title, tab_x + 8, txt_y, lm.font_scale, txt_col);
-			gfx::end_scissor();
+			gfxx::end_scissor();
 		}
 
 		int close_x   = tab_x + tab_w - close_box_w;
@@ -7894,8 +7904,8 @@ fn void render(Editor* ed, int screen_w, int height, LayoutMetrics* lm)
 	}
 
 	// Gutter and Git Diffs
-	gfx::draw_rect(0, lm.tab_bar_height, lm.gutter_width - config::LAYOUT_METRICS.gutter_border_w, lm.editor_h, config::theme.gutter_bg);
-	gfx::draw_rect(lm.gutter_width - config::LAYOUT_METRICS.gutter_border_w, lm.tab_bar_height, config::LAYOUT_METRICS.gutter_border_w, lm.editor_h, config::theme.gutter_border);
+	gfxx::draw_rect(0, lm.tab_bar_height, lm.gutter_width - config::LAYOUT_METRICS.gutter_border_w, lm.editor_h, config::theme.gutter_bg);
+	gfxx::draw_rect(lm.gutter_width - config::LAYOUT_METRICS.gutter_border_w, lm.tab_bar_height, config::LAYOUT_METRICS.gutter_border_w, lm.editor_h, config::theme.gutter_border);
 
 	Cursor* primary = doc.primary_cursor();
 	LineCol cur_lc  = doc.get_line_col(primary.pos);
@@ -7916,11 +7926,11 @@ fn void render(Editor* ed, int screen_w, int height, LayoutMetrics* lm)
 			switch (st)
 			{
 				case ADDED:
-					gfx::draw_rect(gx, gy, 3, lm.line_height, config::theme.git_added);
+					gfxx::draw_rect(gx, gy, 3, lm.line_height, config::theme.git_added);
 				case MODIFIED:
-					gfx::draw_rect(gx, gy, 3, lm.line_height, config::theme.git_modified);
+					gfxx::draw_rect(gx, gy, 3, lm.line_height, config::theme.git_modified);
 				case DELETED:
-					gfx::draw_triangle(
+					gfxx::draw_triangle(
 						{ (float)gx, (float)gy },
 						{ (float)gx, (float)gy + 6.0f },
 						{ (float)(gx + 5), (float)gy + 3.0f },
@@ -7939,7 +7949,7 @@ fn void render(Editor* ed, int screen_w, int height, LayoutMetrics* lm)
 	}
 
 	// Editor Text Canvas
-	gfx::begin_scissor(lm.text_start_x, lm.text_start_y, lm.editor_w, lm.editor_h - 12);
+	gfxx::begin_scissor(lm.text_start_x, lm.text_start_y, lm.editor_w, lm.editor_h - 12);
 
 	foreach (&cur : doc.cursors)
 	{
@@ -7947,7 +7957,7 @@ fn void render(Editor* ed, int screen_w, int height, LayoutMetrics* lm)
 		if (active_rel_line >= 0 && active_rel_line < lm.visible_lines)
 		{
 			int hl_y = lm.text_start_y + active_rel_line * lm.line_height;
-			gfx::draw_rect(lm.text_start_x - 8, hl_y, lm.editor_w + 8, lm.line_height, config::theme.line_highlight);
+			gfxx::draw_rect(lm.text_start_x - 8, hl_y, lm.editor_w + 8, lm.line_height, config::theme.line_highlight);
 		}
 	}
 
@@ -8010,7 +8020,7 @@ fn void render(Editor* ed, int screen_w, int height, LayoutMetrics* lm)
 								int sy_end   = lm.text_start_y + (bot_l - tab.scroll_line) * lm.line_height;
 								bool is_active_scope = (cline >= l && cline <= l_close);
 								Color scol = is_active_scope ? config::theme.indent_guide_active : config::theme.indent_guide;
-								gfx::draw_line(sx, sy_start, sx, sy_end, scol);
+								gfxx::draw_line(sx, sy_start, sx, sy_end, scol);
 							}
 						}
 					}
@@ -8114,17 +8124,17 @@ fn void render(Editor* ed, int screen_w, int height, LayoutMetrics* lm)
 					{
 						if (is_selected)
 						{
-							gfx::draw_rect(px, py, tab_w, lm.line_height, config::theme.selection_bg);
+							gfxx::draw_rect(px, py, tab_w, lm.line_height, config::theme.selection_bg);
 						}
 						else if (is_search_match)
 						{
 							Color match_bg     = { 250, 204, 21, 95 };
 							Color match_border = { 250, 204, 21, 200 };
-							gfx::draw_rect(px, py, tab_w, lm.line_height, match_bg);
-							gfx::draw_line(px, py, px + tab_w, py, match_border);
-							gfx::draw_line(px, py + lm.line_height - 1, px + tab_w, py + lm.line_height - 1, match_border);
-							if (is_match_start) gfx::draw_line(px, py, px, py + lm.line_height, match_border);
-							if (is_match_end)   gfx::draw_line(px + tab_w - 1, py, px + tab_w - 1, py + lm.line_height, match_border);
+							gfxx::draw_rect(px, py, tab_w, lm.line_height, match_bg);
+							gfxx::draw_line(px, py, px + tab_w, py, match_border);
+							gfxx::draw_line(px, py + lm.line_height - 1, px + tab_w, py + lm.line_height - 1, match_border);
+							if (is_match_start) gfxx::draw_line(px, py, px, py + lm.line_height, match_border);
+							if (is_match_end)   gfxx::draw_line(px + tab_w - 1, py, px + tab_w - 1, py + lm.line_height, match_border);
 						}
 						else
 						{
@@ -8145,19 +8155,19 @@ fn void render(Editor* ed, int screen_w, int height, LayoutMetrics* lm)
 					{
 						if (is_selected)
 						{
-							gfx::draw_rect(px, py, lm.char_width, lm.line_height, config::theme.selection_bg);
+							gfxx::draw_rect(px, py, lm.char_width, lm.line_height, config::theme.selection_bg);
 							font::draw_char(codepoint, px, py, lm.font_scale, config::theme.text_bright);
 						}
 						else if (is_search_match)
 						{
 							Color match_bg     = { 250, 204, 21, 95 };
 							Color match_border = { 250, 204, 21, 200 };
-							gfx::draw_rect(px, py, lm.char_width, lm.line_height, match_bg);
-							gfx::draw_line(px, py, px + lm.char_width, py, match_border);
-							gfx::draw_line(px, py + lm.line_height - 1, px + lm.char_width, py + lm.line_height - 1, match_border);
+							gfxx::draw_rect(px, py, lm.char_width, lm.line_height, match_bg);
+							gfxx::draw_line(px, py, px + lm.char_width, py, match_border);
+							gfxx::draw_line(px, py + lm.line_height - 1, px + lm.char_width, py + lm.line_height - 1, match_border);
 
-							if (is_match_start) gfx::draw_line(px, py, px, py + lm.line_height, match_border);
-							if (is_match_end)   gfx::draw_line(px + lm.char_width - 1, py, px + lm.char_width - 1, py + lm.line_height, match_border);
+							if (is_match_start) gfxx::draw_line(px, py, px, py + lm.line_height, match_border);
+							if (is_match_end)   gfxx::draw_line(px + lm.char_width - 1, py, px + lm.char_width - 1, py + lm.line_height, match_border);
 							font::draw_char(codepoint, px, py, lm.font_scale, config::theme.text_bright);
 						}
 						else
@@ -8186,7 +8196,7 @@ fn void render(Editor* ed, int screen_w, int height, LayoutMetrics* lm)
 				int px = lm.text_start_x + (cur_col - tab.scroll_col) * lm.char_width;
 				if (px >= lm.text_start_x && px < screen_w)
 				{
-					gfx::draw_rect(px, py, lm.char_width, lm.line_height, config::theme.selection_bg);
+					gfxx::draw_rect(px, py, lm.char_width, lm.line_height, config::theme.selection_bg);
 				}
 			}
 		}
@@ -8206,8 +8216,8 @@ fn void render(Editor* ed, int screen_w, int height, LayoutMetrics* lm)
 
 				for (int wx = sx; wx < sx + 30; wx += 4)
 				{
-					gfx::draw_line(wx, sy, wx + 2, sy - 2, scol);
-					gfx::draw_line(wx + 2, sy - 2, wx + 4, sy, scol);
+					gfxx::draw_line(wx, sy, wx + 2, sy - 2, scol);
+					gfxx::draw_line(wx + 2, sy - 2, wx + 4, sy, scol);
 				}
 			}
 		}
@@ -8226,19 +8236,19 @@ fn void render(Editor* ed, int screen_w, int height, LayoutMetrics* lm)
 			{
 				int cx = lm.text_start_x + (cur_c - tab.scroll_col) * lm.char_width;
 				int cy = lm.text_start_y + active_rel_l * lm.line_height;
-				gfx::draw_rect(cx, cy, 2, lm.line_height, config::theme.cursor);
+				gfxx::draw_rect(cx, cy, 2, lm.line_height, config::theme.cursor);
 			}
 		}
 	}
 
-	gfx::end_scissor();
+	gfxx::end_scissor();
 
 	// Minimap
 	if (config::settings.show_minimap && lm.minimap_w > 0)
 	{
 		int mm_y = lm.tab_bar_height;
 		int mm_h = lm.editor_h;
-		gfx::draw_rect(lm.minimap_x, mm_y, lm.minimap_w, mm_h, config::theme.minimap_bg);
+		gfxx::draw_rect(lm.minimap_x, mm_y, lm.minimap_w, mm_h, config::theme.minimap_bg);
 
 		int total_doc_lines = doc.get_total_lines();
 		int mm_line_h = config::LAYOUT_METRICS.minimap_line_h;
@@ -8255,7 +8265,7 @@ fn void render(Editor* ed, int screen_w, int height, LayoutMetrics* lm)
 		int mm_start_l = mm_scroll_y / mm_line_h;
 		int mm_end_l   = math::min(total_doc_lines, mm_start_l + (mm_h / mm_line_h) + 1);
 
-		gfx::begin_scissor(lm.minimap_x, mm_y, lm.minimap_w, mm_h);
+		gfxx::begin_scissor(lm.minimap_x, mm_y, lm.minimap_w, mm_h);
 
 		for (int l = mm_start_l; l < mm_end_l; l++)
 		{
@@ -8268,11 +8278,11 @@ fn void render(Editor* ed, int screen_w, int height, LayoutMetrics* lm)
 				switch (st)
 				{
 					case ADDED:
-						gfx::draw_rect(lm.minimap_x, my, 3, mm_line_h, config::theme.git_added);
+						gfxx::draw_rect(lm.minimap_x, my, 3, mm_line_h, config::theme.git_added);
 					case MODIFIED:
-						gfx::draw_rect(lm.minimap_x, my, 3, mm_line_h, config::theme.git_modified);
+						gfxx::draw_rect(lm.minimap_x, my, 3, mm_line_h, config::theme.git_modified);
 					case DELETED:
-						gfx::draw_rect(lm.minimap_x, my, 5, 2, config::theme.git_deleted);
+						gfxx::draw_rect(lm.minimap_x, my, 5, 2, config::theme.git_deleted);
 					default: break;
 				}
 			}
@@ -8282,7 +8292,7 @@ fn void render(Editor* ed, int screen_w, int height, LayoutMetrics* lm)
 			int line_len = (int)math::min((sz)lm.minimap_w - 6, (le - ls) / 2);
 			if (line_len > 0)
 			{
-				gfx::draw_rect(lm.minimap_x + 4, my, line_len, mm_line_h, config::theme.text_muted);
+				gfxx::draw_rect(lm.minimap_x + 4, my, line_len, mm_line_h, config::theme.text_muted);
 			}
 		}
 
@@ -8291,7 +8301,7 @@ fn void render(Editor* ed, int screen_w, int height, LayoutMetrics* lm)
 			int my = mm_y + match_l * mm_line_h - mm_scroll_y;
 			if (my >= mm_y && my < mm_y + mm_h)
 			{
-				gfx::draw_rect(lm.minimap_x, my, lm.minimap_w, 2, config::theme.accent_yellow);
+				gfxx::draw_rect(lm.minimap_x, my, lm.minimap_w, 2, config::theme.accent_yellow);
 			}
 		}
 
@@ -8299,10 +8309,10 @@ fn void render(Editor* ed, int screen_w, int height, LayoutMetrics* lm)
 		int vp_h = math::max(config::LAYOUT_METRICS.minimap_min_thumb_h, lm.visible_lines * mm_line_h);
 		vp_y = math::clamp(vp_y, mm_y, mm_y + mm_h - vp_h);
 
-		gfx::draw_rect(lm.minimap_x, vp_y, lm.minimap_w, vp_h, config::theme.minimap_viewport);
-		gfx::draw_rect_lines(lm.minimap_x, vp_y, lm.minimap_w, vp_h, config::theme.accent_blue);
+		gfxx::draw_rect(lm.minimap_x, vp_y, lm.minimap_w, vp_h, config::theme.minimap_viewport);
+		gfxx::draw_rect_lines(lm.minimap_x, vp_y, lm.minimap_w, vp_h, config::theme.accent_blue);
 
-		gfx::end_scissor();
+		gfxx::end_scissor();
 	}
 
 	// Scrollbar
@@ -8317,9 +8327,9 @@ fn void render(Editor* ed, int screen_w, int height, LayoutMetrics* lm)
 		float scrollable_h = (float)sb_h - thumb_h;
 		float thumb_y      = (float)sb_y + (scrollable_h * (float)tab.scroll_line / max_scroll);
 
-		gfx::draw_rect(sb_x, sb_y, sb_w, sb_h, config::theme.header_bg);
+		gfxx::draw_rect(sb_x, sb_y, sb_w, sb_h, config::theme.header_bg);
 		Color thumb_col = ed.scrollbar_dragging ? config::theme.scrollbar_act : config::theme.scrollbar;
-		gfx::draw_rect(sb_x + 1, (int)thumb_y, sb_w - 2, (int)thumb_h, thumb_col);
+		gfxx::draw_rect(sb_x + 1, (int)thumb_y, sb_w - 2, (int)thumb_h, thumb_col);
 
 		if (config::settings.show_git_gutter)
 		{
@@ -8329,14 +8339,14 @@ fn void render(Editor* ed, int screen_w, int height, LayoutMetrics* lm)
 				Color gcol = (hunk.status == ADDED)
 					? config::theme.git_added
 					: ((hunk.status == DELETED) ? config::theme.git_deleted : config::theme.git_modified);
-				gfx::draw_rect(sb_x, tick_y, sb_w, 2, gcol);
+				gfxx::draw_rect(sb_x, tick_y, sb_w, 2, gcol);
 			}
 		}
 
 		foreach (match_l : ed.modal.cached_match_lines)
 		{
 			int tick_y = sb_y + (int)(((float)match_l / (float)doc.get_total_lines()) * (float)sb_h);
-			gfx::draw_rect(sb_x, tick_y, sb_w, 2, config::theme.accent_yellow);
+			gfxx::draw_rect(sb_x, tick_y, sb_w, 2, config::theme.accent_yellow);
 		}
 
 		foreach (&d : ed.workspace.diagnostics.items)
@@ -8345,7 +8355,7 @@ fn void render(Editor* ed, int screen_w, int height, LayoutMetrics* lm)
 			{
 				int tick_y = sb_y + (int)(((float)d.line / (float)doc.get_total_lines()) * (float)sb_h);
 				Color tcol = (d.severity == ERROR) ? config::theme.accent_red : config::theme.accent_yellow;
-				gfx::draw_rect(sb_x, tick_y, sb_w, 2, tcol);
+				gfxx::draw_rect(sb_x, tick_y, sb_w, 2, tcol);
 			}
 		}
 	}
@@ -8364,8 +8374,8 @@ fn void render(Editor* ed, int screen_w, int height, LayoutMetrics* lm)
 		if (pop_x + pop_w > screen_w - 20) pop_x = screen_w - pop_w - 20;
 		if (pop_y + pop_h > height - lm.footer_height) pop_y = pop_y - pop_h - lm.line_height;
 
-		gfx::draw_rect(pop_x - 2, pop_y - 2, pop_w + 4, pop_h + 4, config::theme.popup_border);
-		gfx::draw_rect(pop_x, pop_y, pop_w, pop_h, config::theme.popup_bg);
+		gfxx::draw_rect(pop_x - 2, pop_y - 2, pop_w + 4, pop_h + 4, config::theme.popup_border);
+		gfxx::draw_rect(pop_x, pop_y, pop_w, pop_h, config::theme.popup_bg);
 
 		for (int r = 0; r < pop_rows; r++)
 		{
@@ -8377,7 +8387,7 @@ fn void render(Editor* ed, int screen_w, int height, LayoutMetrics* lm)
 
 			if (item_idx == ed.autocomplete.selected_index)
 			{
-				gfx::draw_rect(pop_x + 2, ry, pop_w - 4, row_h, config::theme.popup_selected);
+				gfxx::draw_rect(pop_x + 2, ry, pop_w - 4, row_h, config::theme.popup_selected);
 			}
 
 			String kind_tag = "[v]";
@@ -8408,12 +8418,12 @@ fn void render(Editor* ed, int screen_w, int height, LayoutMetrics* lm)
 		int ty = (int)lm.terminal_rect.y;
 		int th = lm.terminal_height;
 
-		gfx::draw_rect(0, ty, screen_w, th, config::theme.panel_bg);
-		gfx::draw_rect(0, ty, screen_w, 2, config::theme.accent_blue);
+		gfxx::draw_rect(0, ty, screen_w, th, config::theme.panel_bg);
+		gfxx::draw_rect(0, ty, screen_w, 2, config::theme.accent_blue);
 
 		font::draw_text("[BUILD & RUN OUTPUT] (Ctrl+~ to toggle | Click+Drag to Copy)", 12, ty + 6, lm.font_scale, config::theme.accent_blue);
 
-		gfx::begin_scissor(12, ty + lm.line_height + 4, screen_w - 24, th - lm.line_height - 8);
+		gfxx::begin_scissor(12, ty + lm.line_height + 4, screen_w - 24, th - lm.line_height - 8);
 		int max_term_lines = (th - lm.line_height - 8) / lm.line_height;
 		int total_tlines   = (int)ed.terminal.lines.len();
 		int start_idx      = math::clamp(ed.terminal.scroll_line - max_term_lines + 1, 0, math::max(0, total_tlines - max_term_lines));
@@ -8433,7 +8443,7 @@ fn void render(Editor* ed, int screen_w, int height, LayoutMetrics* lm)
 					int e_col = (idx == e_line) ? math::max(ed.terminal.sel_start_col, ed.terminal.sel_end_col) : (int)line_text.len;
 					int hl_x  = 14 + s_col * lm.char_width;
 					int hl_w  = math::max(1, (e_col - s_col)) * lm.char_width;
-					gfx::draw_rect(hl_x, row_y, hl_w, lm.line_height, config::theme.selection_bg);
+					gfxx::draw_rect(hl_x, row_y, hl_w, lm.line_height, config::theme.selection_bg);
 				}
 			}
 
@@ -8448,7 +8458,7 @@ fn void render(Editor* ed, int screen_w, int height, LayoutMetrics* lm)
 			}
 			font::draw_text(line_text, 14, row_y, lm.font_scale, tcol);
 		}
-		gfx::end_scissor();
+		gfxx::end_scissor();
 	}
 
 	// Modals
@@ -8459,7 +8469,7 @@ fn void render(Editor* ed, int screen_w, int height, LayoutMetrics* lm)
 
 	int footer_y      = (int)lm.footer_rect.y;
 	int footer_text_y = footer_y + (lm.footer_height - lm.char_height) / 2;
-	gfx::draw_rect(0, footer_y, screen_w, lm.footer_height, config::theme.footer_bg);
+	gfxx::draw_rect(0, footer_y, screen_w, lm.footer_height, config::theme.footer_bg);
 
 	String file_disp = doc.filepath.len > 0 ? doc.filepath : "untitled.c3";
 	String mod_str   = doc.is_modified ? " [+]" : "";
@@ -8499,8 +8509,9 @@ fn void render(Editor* ed, int screen_w, int height, LayoutMetrics* lm)
 	int right_w = (int)right_str.len * lm.char_width;
 	font::draw_text(right_str, screen_w - right_w - 12, footer_text_y, lm.font_scale, config::theme.header_muted);
 
-	gfx::end_frame();
+	gfxx::end_frame();
 }
+
 module c3ed;
 import std;
 
