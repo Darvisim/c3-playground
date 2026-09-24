@@ -15,7 +15,7 @@
 
 <div align="center">
   <a href="https://manulinares.github.io/c3-playground/">
-    <img width="900" alt="preview" src="https://github.com/user-attachments/assets/c120d6f2-c011-43f1-a619-831a4a72ba8a" />
+    <img width="900" alt="preview" src="https://github.com/user-attachments/assets/3efc7fe3-11ed-42d9-b3f8-cdb755cebdc0" />
   </a>
 </div>
 
