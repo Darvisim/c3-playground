@@ -26,7 +26,7 @@ jobs:
 
       - name: Clone C3 Compiler
         run: |
-          git clone --depth 1 https://github.com/Manulinares/c3c.git -b meson_setup_build c3c
+          git clone --depth 1 https://github.com/Manulinares/c3c.git -b meson_build_system c3c
 
       - name: Install System Dependencies
         run: |
