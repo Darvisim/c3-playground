@@ -256,12 +256,12 @@ export function setupMonacoC3(monaco) {
 			{ token: 'delimiter', foreground: 'c9d1d9' }
 		],
 		colors: {
-			'editor.background': '#1e293b',
+			'editor.background': '#272935',
 			'editor.foreground': '#D39DD6',
-			'editor.lineHighlightBackground': '#33415544',
+			'editor.lineHighlightBackground': '#33374844',
 			'editorCursor.foreground': '#38bdf8',
 			'editor.selectionBackground': '#38bdf822',
-			'editorLineNumber.foreground': '#475569',
+			'editorLineNumber.foreground': '#5c637a',
 			'editorLineNumber.activeForeground': '#38bdf8'
 		}
 	});

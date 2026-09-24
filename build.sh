@@ -422,6 +422,8 @@ mkdir -p "${DIST_DIR}/build"
 cp "${SCRIPT_DIR}/index.html" "${DIST_DIR}/"
 cp "${SCRIPT_DIR}/c3-worker.js" "${DIST_DIR}/"
 cp "${SCRIPT_DIR}/favicon.svg" "${DIST_DIR}/"
+cp "${SCRIPT_DIR}/preview.png" "${DIST_DIR}/"
+cp "${SCRIPT_DIR}/apple-touch-icon.png" "${DIST_DIR}/"
 
 # Copy JS modules & C3 examples folders
 cp -r "${SCRIPT_DIR}/js" "${DIST_DIR}/"

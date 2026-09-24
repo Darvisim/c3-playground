@@ -16,9 +16,9 @@ import { parseAssetDirectives, fetchAssets, writeVfsFile } from './assets.js';
 
 // DOM Elements
 const outputEl = document.getElementById("output");
-const statusEl = document.getElementById("status");
 const statusTooltipEl = document.getElementById("statusTooltip");
 const compileBtn = document.getElementById("compileBtn");
+const compileBtnText = document.getElementById("compileBtnText");
 const clearBtn = document.getElementById("clearBtn");
 const copyBtn = document.getElementById("copyBtn");
 const saveBtn = document.getElementById("saveBtn");
@@ -35,6 +35,12 @@ const canvasContainer = document.getElementById("canvasContainer");
 
 let editor = null;
 let rawConsoleOutput = "";
+
+const isMac = /Mac|iPod|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
+const shortcutHintEl = document.getElementById("shortcutHint");
+if (shortcutHintEl) {
+	shortcutHintEl.textContent = isMac ? "⌘↵" : "Ctrl+↵";
+}
 
 const DEFAULT_COPY_HTML = copyBtn.innerHTML;
 
@@ -175,8 +181,15 @@ if (OrigAudioContext && !window.__c3AudioTracked) {
 let currentEmscriptenInstance = null;
 
 function setStatus(text, stateClass) {
-	statusEl.textContent = text;
-	statusEl.className = "status-badge " + (stateClass || "");
+	if (stateClass === "ready") {
+		compileBtn.disabled = false;
+		if (compileBtnText) compileBtnText.textContent = "Compile & Run";
+		if (shortcutHintEl) shortcutHintEl.style.display = "";
+	} else {
+		compileBtn.disabled = true;
+		if (compileBtnText) compileBtnText.textContent = text;
+		if (shortcutHintEl) shortcutHintEl.style.display = "none";
+	}
 }
 
 function resumeAudioIfSuspended() {
@@ -493,6 +506,9 @@ require(['vs/editor/editor.main'], async () => {
 		queryCompilerVersion(vText => { statusTooltipEl.textContent = vText; });
 		setStatus("Compiler Ready", "ready");
 		compileBtn.disabled = false;
+		if (!shared || shared.type !== 'example' || !matchedExampleFile) {
+			outputEl.textContent = `C3 WebAssembly Playground\n100% client-side: compilation and execution run entirely in your browser.\n\nPress Compile & Run (${isMac ? "Cmd+Enter" : "Ctrl+Enter"}) to execute.\n`;
+		}
 		queueDocgenUpdate(editor.getValue());
 		// Kick off stdlib HTML docgen in the background - no-op if already cached
 		setTimeout(() => triggerStdlibDocgenHtml(), 100);
