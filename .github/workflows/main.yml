@@ -26,12 +26,12 @@ jobs:
 
       - name: Clone C3 Compiler
         run: |
-          git clone --depth 1 https://github.com/c3lang/c3c.git c3c
+          git clone --depth 1 https://github.com/Manulinares/c3c.git -b meson_setup_build c3c
 
       - name: Install System Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y ninja-build ccache zip
+          sudo apt-get install -y ninja-build meson ccache zip
 
       - name: Setup Emscripten (WebAssembly Compiler)
         uses: emscripten-core/setup-emsdk@v16
