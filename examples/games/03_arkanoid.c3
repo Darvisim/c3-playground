@@ -291,17 +291,17 @@ fn void GameState.draw(&self)
 	rl::draw_circle_v(self.ball_pos + s, self.ball_radius, rl::WHITE);
 
 	// HUD
-	rl::draw_text(rl::text_format("SCORE: %05d", self.score), 24, 20, 18, (RLColor){ 248, 250, 252, 255 });
-	if (self.combo > 1) rl::draw_text(rl::text_format("%dx COMBO!", self.combo), 180, 20, 18, rl::GOLD);
+	rl::draw_text(rl::text_format("SCORE: %05d", self.score), 24, 20, 20, (RLColor){ 248, 250, 252, 255 });
+	if (self.combo > 1) rl::draw_text(rl::text_format("%dx COMBO!", self.combo), 180, 20, 20, rl::GOLD);
 
-	rl::draw_text("LIVES:", 650, 20, 18, (RLColor){ 148, 163, 184, 255 });
-	for (int i = 0; i < self.lives; i++) rl::draw_rectangle_rounded({ 715.0f + (float)i * 22.0f, 22.0f, 16.0f, 8.0f }, 0.5f, 4, rl::SKYBLUE);
+	rl::draw_text("LIVES:", 640, 20, 20, (RLColor){ 148, 163, 184, 255 });
+	for (int i = 0; i < self.lives; i++) rl::draw_rectangle_rounded({ 715.0f + (float)i * 22.0f, 25.0f, 18.0f, 8.0f }, 0.5f, 4, rl::SKYBLUE);
 
 	// Overlays
 	switch (self.state)
 	{
 		case READY:    draw_centered("PRESS [SPACE] OR CLICK TO LAUNCH", 265, 20, rl::GOLD);
-		case PAUSED:   rl::draw_rectangle(0, 0, 800, 450, (RLColor){ 0, 0, 0, 140 }); draw_centered("PAUSED", 205, 36, rl::RAYWHITE);
+		case PAUSED:   rl::draw_rectangle(0, 0, 800, 450, (RLColor){ 0, 0, 0, 140 }); draw_centered("PAUSED", 205, 40, rl::RAYWHITE);
 		case GAMEOVER: rl::draw_rectangle(0, 0, 800, 450, (RLColor){ 0, 0, 0, 180 }); draw_centered("GAME OVER", 190, 40, rl::RED);   draw_centered(rl::text_format("FINAL SCORE: %d", self.score), 240, 20, rl::RAYWHITE);
 		case VICTORY:  rl::draw_rectangle(0, 0, 800, 450, (RLColor){ 0, 0, 0, 180 }); draw_centered("VICTORY!", 190, 40, rl::GREEN); draw_centered(rl::text_format("FINAL SCORE: %d", self.score), 240, 20, rl::RAYWHITE);
 		default: break;

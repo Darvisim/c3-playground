@@ -10,14 +10,14 @@ struct Particle
 	RLColor color;
 }
 
-const int SCREEN_WIDTH  = 640;
+const int SCREEN_WIDTH  = 720;
 const int SCREEN_HEIGHT = 480;
 const int MAX_PARTICLES = 512;
 
 Particle[MAX_PARTICLES] particles;
 int particle_count = 0;
 
-Vec2 player_pos = { 320, 240 };
+Vec2 player_pos = { 360, 240 };
 
 fn void spawn_particles(Vec2 pos, int count)
 {
@@ -89,7 +89,7 @@ fn void update_draw_frame()
 		rl::draw_circle((int)mouse_pos.x, (int)mouse_pos.y, 6.0f, cursor_col);
 
 		// Overlay
-		rl::draw_text("WASD/Arrows to Move  |  Click/Drag to Spawn  |  SPACE to Burst", 20, 20, 18, rl::RAYWHITE);
+		rl::draw_text("WASD/Arrows to Move  |  Click to Spawn  |  SPACE to Burst", 20, 20, 20, rl::RAYWHITE);
 		// rl::draw_fps(SCREEN_WIDTH - 80, 20);
 	};
 }

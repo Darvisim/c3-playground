@@ -357,7 +357,7 @@ fn void draw_game()
 	if (g.paused) draw_centered("PAUSED", SCREEN_HEIGHT / 2 - 15, 30, rl::GRAY);
 	rl::draw_text(rl::text_format("SCORE: %d", (g.tail_count - 1) * 100), 20, 20, 20, rl::GOLD);
 
-	if (g.waiting_for_start) draw_centered("CLICK TO START", SCREEN_HEIGHT / 2 - 14, 28, rl::RAYWHITE);
+	if (g.waiting_for_start) draw_centered("CLICK TO START", SCREEN_HEIGHT / 2 - 14, 30, rl::RAYWHITE);
 	if (g.game_over)
 	{
 		draw_centered("GAME OVER", SCREEN_HEIGHT / 2 - 60, 40, rl::MAROON);

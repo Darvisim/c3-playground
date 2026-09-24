@@ -36,9 +36,9 @@ fn void update_draw_frame()
 			: "Press SPACE or Right-Click to enter 3D FPS Mouse Look";
 		RLColor col   = fps_mode ? rl::GREEN : rl::YELLOW;
 
-		rl::draw_rectangle(15, 15, 480, 65, (RLColor) { 0, 0, 0, 180 });
+		rl::draw_rectangle(15, 15, 420, 65, (RLColor) { 0, 0, 0, 180 });
 		rl::draw_text(title, 25, 25, 20, col);
-		rl::draw_text(sub, 25, 55, 14, rl::RAYWHITE);
+		rl::draw_text(sub, 25, 55, 10, rl::RAYWHITE);
 
 		rl::draw_fps(SCREEN_WIDTH - 80, 20);
 	};
