@@ -58,8 +58,6 @@ meson setup ${BUILD_DIR} ${PROJECT_ROOT} \
   -Davr_disable=true \
   -Ddefault_library=static \
   -Dcpp_thread_count=0 \
-  -Dc_args="-sDISABLE_EXCEPTION_CATCHING=0" \
-  -Dcpp_args="-sDISABLE_EXCEPTION_CATCHING=0" \
   -Dc_link_args="${EMSCRIPTEN_LINK_ARGS}" \
   -Dcpp_link_args="${EMSCRIPTEN_LINK_ARGS}"
 
