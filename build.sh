@@ -45,20 +45,6 @@ emcc -c "${SYS_LIB_DIR}/dummy_m.c" -o "${SYS_LIB_DIR}/dummy_m.o"
 emar rcs "${SYS_LIB_DIR}/libm.a" "${SYS_LIB_DIR}/dummy_m.o"
 rm -f "${SYS_LIB_DIR}/dummy_m.c" "${SYS_LIB_DIR}/dummy_m.o"
 
-EMSCRIPTEN_LINK_ARGS="
-  -sALLOW_MEMORY_GROWTH=1
-  -sFORCE_FILESYSTEM=1
-  -sEXIT_RUNTIME=0
-  -sINITIAL_MEMORY=256MB
-  -sSTACK_SIZE=8MB
-  -sERROR_ON_UNDEFINED_SYMBOLS=0
-  -sEXPORTED_RUNTIME_METHODS=FS,callMain
-  -sEXPORTED_FUNCTIONS=_main,_fflush
-  --preload-file ${HOST_LIB_DIR}@/usr/lib/c3
-  --preload-file ${SYS_LIB_DIR}@/usr/lib/c3/wasm32-emscripten
-  --preload-file ${RAYLIB_LIB}@/usr/lib/c3/lib/raylib6.c3l
-"
-
 # 2. Configure and compile c3c to WebAssembly
 meson setup ${BUILD_DIR} ${PROJECT_ROOT} \
   --cross-file emscripten \
@@ -69,8 +55,8 @@ meson setup ${BUILD_DIR} ${PROJECT_ROOT} \
   -Dlink_dynamic=false \
   -Davr_disable=true \
   -Ddefault_library=static \
-  -Dc_link_args="${EMSCRIPTEN_LINK_ARGS}" \
-  -Dcpp_link_args= "${EMSCRIPTEN_LINK_ARGS}"
+  -Dc_link_args="-sALLOW_MEMORY_GROWTH=1 -sFORCE_FILESYSTEM=1 -sEXIT_RUNTIME=0 -sINITIAL_MEMORY=256MB -sSTACK_SIZE=8MB -sERROR_ON_UNDEFINED_SYMBOLS=0 -sEXPORTED_RUNTIME_METHODS=FS,callMain -sEXPORTED_FUNCTIONS=_main,_fflush --preload-file ${HOST_LIB_DIR}@/usr/lib/c3 --preload-file ${SYS_LIB_DIR}@/usr/lib/c3/wasm32-emscripten --preload-file ${RAYLIB_LIB}@/usr/lib/c3/lib/raylib6.c3l" \
+  -Dcpp_link_args= "-sALLOW_MEMORY_GROWTH=1 -sFORCE_FILESYSTEM=1 -sEXIT_RUNTIME=0 -sINITIAL_MEMORY=256MB -sSTACK_SIZE=8MB -sERROR_ON_UNDEFINED_SYMBOLS=0 -sEXPORTED_RUNTIME_METHODS=FS,callMain -sEXPORTED_FUNCTIONS=_main,_fflush --preload-file ${HOST_LIB_DIR}@/usr/lib/c3 --preload-file ${SYS_LIB_DIR}@/usr/lib/c3/wasm32-emscripten --preload-file ${RAYLIB_LIB}@/usr/lib/c3/lib/raylib6.c3l"
 
 meson compile -C "${BUILD_DIR}"
 
