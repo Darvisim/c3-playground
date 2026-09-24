@@ -49,7 +49,7 @@ EMSCRIPTEN_LINK_ARGS="-sALLOW_MEMORY_GROWTH=1 -sFORCE_FILESYSTEM=1 -sEXIT_RUNTIM
 
 # 2. Configure and compile c3c to WebAssembly
 meson setup ${BUILD_DIR} ${PROJECT_ROOT} \
-  --cross-file emscripten \
+  --cross-file emscripten.txt \
   --buildtype="${BUILD_TYPE,,}" \
   -Dwith_llvm=true \
   -Dfetch_llvm=true \
