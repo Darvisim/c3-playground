@@ -45,23 +45,32 @@ emcc -c "${SYS_LIB_DIR}/dummy_m.c" -o "${SYS_LIB_DIR}/dummy_m.o"
 emar rcs "${SYS_LIB_DIR}/libm.a" "${SYS_LIB_DIR}/dummy_m.o"
 rm -f "${SYS_LIB_DIR}/dummy_m.c" "${SYS_LIB_DIR}/dummy_m.o"
 
-# 2. Configure and compile c3c to WebAssembly
-emcmake cmake -B "${BUILD_DIR}" -S "${PROJECT_ROOT}" -G Ninja \
-  -DCMAKE_C_COMPILER_LAUNCHER=ccache \
-  -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-  -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" \
-  -DC3_WITH_LLVM=ON \
-  -DC3_FETCH_LLVM=ON \
-  -DC3_LLVM_TAG="${LLVM_TAG}" \
-  -DC3_LINK_DYNAMIC=OFF \
-  -DC3_ENABLE_CLANGD_LSP=OFF \
-  -DC3_AVR_DISABLE=ON \
-  -DBUILD_SHARED_LIBS=OFF \
-  -DCMAKE_EXPORT_COMPILE_COMMANDS=OFF \
-  -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=BOTH \
-  -DCMAKE_EXE_LINKER_FLAGS="-sALLOW_MEMORY_GROWTH=1 -sFORCE_FILESYSTEM=1 -sEXIT_RUNTIME=0 -sINITIAL_MEMORY=256MB -sSTACK_SIZE=8MB -sERROR_ON_UNDEFINED_SYMBOLS=0 -sEXPORTED_RUNTIME_METHODS=FS,callMain -sEXPORTED_FUNCTIONS=_main,_fflush --preload-file ${HOST_LIB_DIR}@/usr/lib/c3 --preload-file ${SYS_LIB_DIR}@/usr/lib/c3/wasm32-emscripten --preload-file ${RAYLIB_LIB}@/usr/lib/c3/lib/raylib6.c3l"
+EMSCRIPTEN_LINK_ARGS= "-sALLOW_MEMORY_GROWTH=1 \
+  -sFORCE_FILESYSTEM=1 \
+  -sEXIT_RUNTIME=0 \
+  -sINITIAL_MEMORY=256MB \
+  -sSTACK_SIZE=8MB \
+  -sERROR_ON_UNDEFINED_SYMBOLS=0 \
+  -sEXPORTED_RUNTIME_METHODS=FS,callMain \
+  -sEXPORTED_FUNCTIONS=_main,_fflush \
+  --preload-file ${HOST_LIB_DIR}@/usr/lib/c3 \
+  --preload-file ${SYS_LIB_DIR}@/usr/lib/c3/wasm32-emscripten \
+  --preload-file ${RAYLIB_LIB}@/usr/lib/c3/lib/raylib6.c3l"
 
-cmake --build "${BUILD_DIR}"
+# 2. Configure and compile c3c to WebAssembly
+meson setup ${BUILD_DIR} ${PROJECT_DIR} \
+  --cross-file emscripten \
+  --buildtype="${BUILD_TYPE,,}" \
+  -Dwith_llvm=true \
+  -Dfetch_llvm=true \
+  -Dllvm_tag="${LLVM_TAG}" \
+  -Dlink_dynamic=false \
+  -Davr_disable=true \
+  -Ddefault_library=static \
+  -Dc_link_args="${EMSCRIPTEN_LINK_ARGS}" \
+  -Dcpp_link_args= "${EMSCRIPTEN_LINK_ARGS}"
+
+meson compile -C "${BUILD_DIR}"
 
 # 3. Build standalone Emscripten runtime JS glue (with GLFW3 and WebGL2 support)
 echo "Building standalone Emscripten runtime JS glue..."
