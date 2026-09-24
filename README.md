@@ -6,7 +6,7 @@
 
 <div align="center">
   Code editor and compiler for C3 in the browser.
-  <a href="https://manulinares.github.io/c3-playground/">
+  <a href="https://play.c3-lang.org">
     <strong>( Start Coding )</strong>
   </a>
 </div>
@@ -14,7 +14,7 @@
 <br><br>
 
 <div align="center">
-  <a href="https://manulinares.github.io/c3-playground/">
+  <a href="https://play.c3-lang.org">
     <img width="900" alt="preview" src="https://github.com/user-attachments/assets/3efc7fe3-11ed-42d9-b3f8-cdb755cebdc0" />
   </a>
 </div>
@@ -23,7 +23,7 @@
 
 You can download pre-built playground artifacts from CI or Releases and run them offline with any local static HTTP server:
 
-1. Download `c3-playground.zip` from the latest [GitHub Releases](https://github.com/ManuLinares/c3-playground/releases) or the **Artifacts** section of the latest [Actions CI run](https://github.com/ManuLinares/c3-playground/actions).
+1. Download `c3-playground.zip` from the latest [GitHub Releases](https://github.com/c3lang/c3-playground/releases) or the **Artifacts** section of the latest [Actions CI run](https://github.com/c3lang/c3-playground/actions).
 2. Extract the archive into a folder.
 3. Start a local HTTP server in that directory:
    ```bash
