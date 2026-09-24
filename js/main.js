@@ -35,6 +35,38 @@ const canvasContainer = document.getElementById("canvasContainer");
 
 let editor = null;
 let rawConsoleOutput = "";
+let currentExample = null;
+
+export function hasOptimizationFlag(flagsStr) {
+	if (!flagsStr || !flagsStr.trim()) return false;
+	const regex = /[^\s"']+|"([^"]*)"|'([^']*)'/g;
+	let match;
+	while ((match = regex.exec(flagsStr)) !== null) {
+		const arg = match[1] ?? match[2] ?? match[0];
+		if (/^-O/i.test(arg) && arg !== '-o') return true;
+		if (/^-o[0-5sz]$/i.test(arg)) return true;
+		if (arg === '--optlevel' || arg.startsWith('--optlevel=')) return true;
+		if (arg === '--optsize' || arg.startsWith('--optsize=')) return true;
+	}
+	return false;
+}
+
+export function getCurrentExample() {
+	if (exampleSelect && exampleSelect.value) {
+		const ex = EXAMPLES_MANIFEST.find(e => e.file === exampleSelect.value);
+		if (ex) return ex;
+	}
+	return currentExample;
+}
+
+export function getEffectiveCompilerFlags(userFlagsStr, currentEx) {
+	const trimmed = (userFlagsStr || "").trim();
+	const isNonTutorialExample = Boolean(currentEx && currentEx.category && currentEx.category !== "Tutorials");
+	if (isNonTutorialExample && !hasOptimizationFlag(trimmed)) {
+		return trimmed ? `-O1 ${trimmed}` : "-O1";
+	}
+	return trimmed;
+}
 
 const isMac = /Mac|iPod|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
 const shortcutHintEl = document.getElementById("shortcutHint");
@@ -372,17 +404,29 @@ require(['vs/editor/editor.main'], async () => {
 	if (shared && shared.type === 'example') {
 		const found = EXAMPLES_MANIFEST.find(e => e.id === shared.id || e.file === shared.id);
 		if (found) {
+			currentExample = found;
+			localStorage.setItem("c3_playground_example_id", found.id);
 			matchedExampleFile = found.file;
 			initialCode = await fetchExampleCode(found.file);
 		}
 	} else if (shared && shared.type === 'snippet') {
+		currentExample = null;
+		localStorage.removeItem("c3_playground_example_id");
 		initialCode = shared.code;
 	}
 
 	if (!initialCode) {
 		const savedCode = localStorage.getItem("c3_playground_code");
+		const savedExId = localStorage.getItem("c3_playground_example_id");
+		if (savedExId) {
+			currentExample = EXAMPLES_MANIFEST.find(e => e.id === savedExId) || null;
+		}
 		initialCode = savedCode || await fetchExampleCode(EXAMPLES_MANIFEST[0].file);
-		if (!savedCode) matchedExampleFile = EXAMPLES_MANIFEST[0].file;
+		if (!savedCode) {
+			matchedExampleFile = EXAMPLES_MANIFEST[0].file;
+			currentExample = EXAMPLES_MANIFEST[0];
+			localStorage.setItem("c3_playground_example_id", EXAMPLES_MANIFEST[0].id);
+		}
 	}
 
 	// 3. Create Monaco Instance with Full Settings
@@ -415,6 +459,10 @@ require(['vs/editor/editor.main'], async () => {
 		const code = editor.getValue();
 		localStorage.setItem("c3_playground_code", code);
 		exampleSelect.value = "";
+		if (!code.trim()) {
+			currentExample = null;
+			localStorage.removeItem("c3_playground_example_id");
+		}
 		queueDocgenUpdate(code);
 	});
 
@@ -439,6 +487,8 @@ require(['vs/editor/editor.main'], async () => {
 		// Update URL parameter so example is shareable
 		const selectedEx = EXAMPLES_MANIFEST.find(e => e.file === selectedFile);
 		if (selectedEx) {
+			currentExample = selectedEx;
+			localStorage.setItem("c3_playground_example_id", selectedEx.id);
 			const newUrl = new URL(window.location);
 			newUrl.searchParams.set('example', selectedEx.id);
 			newUrl.hash = '';
@@ -482,6 +532,8 @@ require(['vs/editor/editor.main'], async () => {
 
 		let compileStderrBuffer = [];
 
+		const effectiveFlags = getEffectiveCompilerFlags(extraFlagsInput.value, getCurrentExample());
+
 		executeCompilerTask("compile", codeValue, async (msg) => {
 			if (msg.type === "stdout") {
 				appendConsole(msg.text);
@@ -498,7 +550,7 @@ require(['vs/editor/editor.main'], async () => {
 				const markers = parseCompilerErrors(compileStderrBuffer.join('\n'), editor.getModel(), monaco);
 				monaco.editor.setModelMarkers(editor.getModel(), "c3", markers);
 			}
-		}, extraFlagsInput.value, setStatus, fetchedAssets);
+		}, effectiveFlags, setStatus, fetchedAssets);
 	};
 
 	try {
