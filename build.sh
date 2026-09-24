@@ -60,7 +60,7 @@ EMSCRIPTEN_LINK_ARGS="
 "
 
 # 2. Configure and compile c3c to WebAssembly
-meson setup ${BUILD_DIR} ${PROJECT_DIR} \
+meson setup ${BUILD_DIR} ${PROJECT_ROOT} \
   --cross-file emscripten \
   --buildtype="${BUILD_TYPE,,}" \
   -Dwith_llvm=true \
