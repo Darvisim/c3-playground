@@ -4,9 +4,6 @@ cpp = 'em++'
 ar = 'emar'
 ranlib = 'emranlib'
 
-[properties]
-needs_exe_wrapper = true
-
 [host_machine]
 system = 'emscripten'
 cpu_family = 'wasm32'
